@@ -1,0 +1,15 @@
+{
+  "short_name": "Тесты",
+  "name": "Платформа для тестов по английскому языку",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#f1f5f9"
+}
