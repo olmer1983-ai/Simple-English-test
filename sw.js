@@ -1,27 +1,23 @@
-const CACHE_NAME = 'english-tests-pwa-cache-v2'; // Увеличиваем версию кэша
+const CACHE_NAME = 'english-tests-pwa-cache-v4'; // Увеличиваем версию кэша
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './vite.svg',
   'https://cdn.tailwindcss.com',
-  'https://unpkg.com/@babel/standalone/babel.min.js',
-  'https://aistudiocdn.com/react@^19.2.0',
-  'https://aistudiocdn.com/react-dom@^19.2.0/client',
-  'https://aistudiocdn.com/react-router-dom@^7.9.6'
+  'https://unpkg.com/react@18/umd/react.development.js',
+  'https://unpkg.com/react-dom@18/umd/react-dom.development.js',
+  'https://unpkg.com/react-router@6/umd/react-router.development.js',
+  'https://unpkg.com/react-router-dom@6/umd/react-router-dom.development.js',
+  'https://unpkg.com/@babel/standalone/babel.min.js'
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Принудительная активация нового Service Worker
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Кэш открыт и ассеты добавляются');
-      // Игнорируем ошибки при добавлении некоторых ресурсов, которые могут быть недоступны
-      const promises = ASSETS_TO_CACHE.map(url => {
-        return cache.add(url).catch(err => {
-          console.warn(`Не удалось закэшировать: ${url}`, err);
-        });
-      });
-      return Promise.all(promises);
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
 });
@@ -41,7 +37,8 @@ self.addEventListener('fetch', (event) => {
       
       // Иначе, делаем запрос к сети.
       return fetch(event.request).then(networkResponse => {
-        // Мы не кэшируем ответы от API или других динамических ресурсов здесь
+        // Опционально: можно кэшировать новые запросы "на лету"
+        // Но для этого нужна более сложная логика, чтобы не кэшировать всё подряд
         return networkResponse;
       });
     })
@@ -61,6 +58,8 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // Захватываем контроль над открытыми страницами
+  );
+});
   );
 });
